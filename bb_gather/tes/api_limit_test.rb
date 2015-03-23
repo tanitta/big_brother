@@ -26,9 +26,6 @@ begin
 rescue
 	sleep(15 * 60 + 10)
 	retry
-	# puts "API Count : #{api_count}"
-	# puts " Rate limit exceeded."
-	# exit
 end
 end_time = Time::now
 puts "やっと終わったぜ"

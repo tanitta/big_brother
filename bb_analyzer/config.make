@@ -6,7 +6,7 @@
 ################################################################################
 # OF ROOT
 #   The location of your root openFrameworks installation
-#       (default) OF_ROOT = ../../openFrameworks 
+#       (default) OF_ROOT = ../../.. 
 ################################################################################
 # OF_ROOT = ../../..
 
@@ -76,7 +76,7 @@
 # add a runtime path to search for those shared libraries, since they aren't 
 # incorporated directly into the final executable application binary.
 ################################################################################
-# PROJECT_LDFLAGS=-Wl,-rpath=./libs
+# PROJECT_LDFLAGS=-rpath=./libs
 
 ################################################################################
 # PROJECT DEFINES
@@ -104,8 +104,8 @@
 #
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_CFLAGS = 
-
+PROJECT_CFLAGS += -std=c++11
+PROJECT_CFLAGS += -w
 ################################################################################
 # PROJECT OPTIMIZATION CFLAGS
 #   These are lists of CFLAGS that are target-specific.  While any flags could 
@@ -137,5 +137,5 @@
 #		(default) PROJECT_CC = (blank)
 #   Note: Leave a leading space when adding list items with the += operator
 ################################################################################
-# PROJECT_CXX = 
-# PROJECT_CC = 
+PROJECT_CXX = clang++
+PROJECT_CC = clang

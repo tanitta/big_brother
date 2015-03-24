@@ -1,5 +1,5 @@
 #include "ofMain.h"
-#include "ofApp.h"
+#include "bb_analyzer.hpp"
 
 //========================================================================
 int main( ){
@@ -8,6 +8,6 @@ int main( ){
 	// this kicks off the running of my app
 	// can be OF_WINDOW or OF_FULLSCREEN
 	// pass in width and height too:
-	ofRunApp(new ofApp());
+	ofRunApp(new big_brother::BBAnalyzer());
 
 }

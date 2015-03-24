@@ -9,8 +9,7 @@
 module TweetLib
 	class TwitterAPIController
 
-		def initialize(twitter_client_object)
-			@client_ = twitter_client_object
+		def initialize
 			@requested_api_nums = {}
 		end
 
@@ -19,7 +18,6 @@ module TweetLib
 				@requested_api_nums.store(method_name.to_sym, 1)
 			else
 				@requested_api_nums[method_name.to_sym] += 1
-
 			end
 		end
 		

@@ -42,7 +42,9 @@ namespace big_brother {
 						xml.pushTag("followers");
 						for(int j = 0; j < xml.getNumTags("id"); j++ ){
 							int follower_id = xml.getValue("id", 0, j);
+							if(users_.find(follower_id) == users_.end()){
 							add_user(follower_id,"??");
+							}
 							users_[id].followers_.insert(follower_id);
 						}
 						xml.popTag();
@@ -52,8 +54,10 @@ namespace big_brother {
 						xml.pushTag("followers");
 						for(int j = 0; j < xml.getNumTags("id"); j++ ){
 							int follower_id = xml.getValue("id", 0, j);
-							users_[id].followers_.insert(follower_id);
+							if(users_.find(follower_id) == users_.end()){
 							add_user(follower_id,"??");
+							}
+							users_[id].followers_.insert(follower_id);
 						}
 						xml.popTag();
 					}

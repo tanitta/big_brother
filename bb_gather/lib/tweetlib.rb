@@ -12,7 +12,7 @@ require 'openssl'
 require 'oauth'
 require 'json'
 
-module Tweetlib
+module TweetLib
 	class Client
 		def initialize(keys)
 			consumer_key = keys[0]

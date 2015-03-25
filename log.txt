@@ -1,0 +1,70 @@
+commit c77fdd59d7d2bb3a15971bbaadcf38946c5a4bd4
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Thu Mar 26 00:01:55 2015 +0900
+
+    Revert "tweetlibにfollowers_idsとshow_userを追加"
+    
+    This reverts commit 4d39eb3492a4d6c0dd942d8efbe632f4eab918d6.
+
+commit 4d39eb3492a4d6c0dd942d8efbe632f4eab918d6
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Wed Mar 25 23:57:24 2015 +0900
+
+    tweetlibにfollowers_idsとshow_userを追加
+
+commit bb42c1a13e06ebf73bac8137a5d45695212c5369
+Merge: 5aead2b eef6d4e
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Wed Mar 25 00:02:42 2015 +0900
+
+    Merge pull request #1 from tanitta/feature-bb_gather-add-APIAccsessor
+    
+    TwitterAPIAccsessorを追加
+
+commit eef6d4ea24504174dd03531a9cdd757e09442bb9
+Author: tanitta <ttata.trit@gmail.com>
+Date:   Wed Mar 25 08:59:39 2015 +0900
+
+    TwitterAPIAccsessorを追加
+
+commit 5aead2b3d144763570cbe8db77f77e089ca9bf12
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Tue Mar 24 17:35:44 2015 +0900
+
+    クライアントオブジェクトの必要性を感じなかった
+
+commit 8efecc31df47098226f15f908d3c6ed6ec1a141a
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Tue Mar 24 17:14:07 2015 +0900
+
+    TwitterAPIControllerをTweetLibモジュールの中に入れた
+
+commit e60756ab581577a2a6766a35ed43e1ab4d012eab
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Tue Mar 24 01:40:36 2015 +0900
+
+    TO DOリストを作成、これでやることがバッチリだぜ！
+
+commit d3f953abf40fa80c72b8f453bea50fb1746d97d9
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Tue Mar 24 01:23:40 2015 +0900
+
+    いろいろコミット（全然出来てない）
+
+commit 4a74966ef3ac52f27ee31de7223cb5605e142e52
+Author: toshiemon18 <st12318@gmail.com>
+Date:   Sun Mar 1 17:57:59 2015 +0900
+
+    First commit.
+
+commit 4c1f618ab75d9b45e4c95d0121c28a675374ad6d
+Author: tanitta <ttata.trit@gmail.com>
+Date:   Sun Mar 1 02:53:31 2015 +0900
+
+    Readmeに追記
+
+commit 4fb2e999475b1d222c344c39548aef1b6033c939
+Author: tanitta <ttata.trit@gmail.com>
+Date:   Sun Mar 1 01:48:28 2015 +0900
+
+    first commit

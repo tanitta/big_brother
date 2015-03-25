@@ -60,12 +60,31 @@ module TweetLib
 			return access_token
 		end
 
+		# User
 		#get your account infomations
 		def fetch_account_info
 			response = @access_token.get("/1.1/account/verify_credentials.json")
 			JSON.parse(response.body)
 		end
-		
+
+		# get information for the specified user
+		# 180times/15min
+		def show_users(args={})
+			params = args.map { |k, v| "#{k}=#{v}" }.join("&")
+			response = @access_token.get("/1.1/users/show.json?#{params}")
+			JSON.parse(response.body)
+		end
+
+		# Friend/Follower
+		# get your followers ids
+		# 15times/15min
+		def followers_ids(args={})
+			params = args.map { |k, v| "#{k}=#{v}" }.join("&")
+			response = @access_token.get("/1.1/followers/ids.json?#{params}")
+			JSON.parse(response.body)
+		end
+
+		# Tweet
 		#update tweet
 		def update(body, id="")
 			if id.empty? then
@@ -134,7 +153,7 @@ module TweetLib
 
 			https.start do |https|
 				request = Net::HTTP::Post.new(uri.request_uri, 'Accept-Encoding'=>'identity')
-				request.set_form_data(param) if param!=nil
+				request.set_form_data(param) if param
 				request.oauth!(https, @consumer, @access_token)
 				buf = ""
 

@@ -20,6 +20,10 @@ module TweetLib
 				@requested_api_nums[method_name.to_sym] += 1
 			end
 		end
+
+		def check_request_count(method_name)
+			@requested_api_nums[method_name.to_sym].to_i
+		end
 		
 	end
 end

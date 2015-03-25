@@ -19,7 +19,7 @@ namespace big_brother {
 				ofEnableAlphaBlending();
 				ofEnableDepthTest();
 				ofEnableAntiAliasing();
-				ofBackground(0,0,0);
+				ofBackground(32,32,32);
 				
 				data_manager_.load_from_xml("hoge.xml");
 				data_manager_.setup_particle();
@@ -87,14 +87,30 @@ namespace big_brother {
 				data_manager_.users_[data_manager_.entry_id_].particle_.position_[0] = 0;
 				data_manager_.users_[data_manager_.entry_id_].particle_.position_[1] = 0;
 				data_manager_.users_[data_manager_.entry_id_].particle_.position_[2] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.position_[0] = 0;
 				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[0] = 0;
 				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[1] = 0;
 				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[2] = 0;
+				
+				
+				// int n = mesh.getNumVertices();
+				// float nearestDistance = 0;
+				// ofVec2f nearestVertex;
+				// int nearestIndex = 0;
+				// ofVec2f mouse(mouseX, mouseY);
+				// for(int i = 0; i < n; i++) {
+				// 	ofVec3f cur = cam.worldToScreen(mesh.getVertex(i));
+				// 	float distance = cur.distance(mouse);
+				// 	if(i == 0 || distance < nearestDistance) {
+				// 		nearestDistance = distance;
+				// 		nearestVertex = cur;
+				// 		nearestIndex = i;
+				// 	}
+				// }
 			};
 			
 			void draw(){
 				cam_.begin();
+				ofFill();
 				ofSetColor(255,255,255);
 				for (auto&& user : data_manager_.users_) {
 					double x = user.second.particle_.position_[0];
@@ -116,6 +132,45 @@ namespace big_brother {
 					ofLine(x1,y1,z1,x2,y2,z2);
 				}
 				cam_.end();
+				
+				double range = 100;
+				double nearest_distance = range;
+				ofVec2f nearest_vertex;
+				int nearest_id = 0;
+				ofVec2f mouse(mouseX, mouseY);
+				for(auto&& user : data_manager_.users_){
+					double x = user.second.particle_.position_[0];
+					double y = user.second.particle_.position_[1];
+					double z = user.second.particle_.position_[2];
+					ofVec3f cur = cam_.worldToScreen(ofVec3f(x,y,z));
+					// ofSetColor(ofColor::white);
+					// ofFill();
+					// ofCircle(cur, 2);
+					double distance = cur.distance(mouse);
+					if(distance < nearest_distance) {
+						nearest_distance= distance;
+						nearest_vertex = cur;
+						nearest_id = user.second.id_;
+					}
+				}
+				// std::cout << "nearest_distance: " << nearest_distance<< std::endl;
+				if(nearest_distance < range){
+					ofSetColor(ofColor::gray);
+					ofLine(nearest_vertex, mouse);
+
+					ofNoFill();
+					ofSetColor(ofColor::magenta);
+					ofSetLineWidth(2);
+					ofCircle(nearest_vertex, 4);
+					ofSetLineWidth(1);
+
+					ofVec2f offset(10, -10);
+					std::string info = "";
+					info +="user_id : "+ofToString(nearest_id);
+					info +="\n";
+					info +="screen_name : "+ofToString(data_manager_.users_[nearest_id].screen_name_);
+					ofDrawBitmapStringHighlight(info, mouse + offset);
+				}
 			};
 			
 			void keyPressed(int key){};

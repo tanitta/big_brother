@@ -7,15 +7,18 @@ module TweetLib
 	class TwitterAPIAccessor
 
 		attr_reader :counter
+		attr_accessor :rate_limit
 		
-		def initialize(proc)
+		def initialize(proc, rate_limit)
 			@proc = proc
 			@counter = 0
+			@rate_limit = rate_limit
 		end
 
 		def call(args={})
 			@counter = @counter + 1
-			return @proc.call(args)
+			@counter = 0 if @counter >= @rate_limit
+			@proc.call(args)
 		end
 
 	end

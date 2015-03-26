@@ -1,33 +1,29 @@
 <user>
-	<id>1</id>
+	<id>115981748</id>
 	<screen_name>ttata_trit</screen_name>
 	<followers>
-		<id>2</id>
-		<id>4</id>
+	<id>115981749</id>
+	<id>115181750</id>
+	<id>115281751</id>
 	</followers>
 </user>
-
+ 
 <user>
-	<id>2</id>
-	<screen_name>toshiemon18</screen_name>
+	<id>9</id>
+	<screen_name>?</screen_name>
 	<followers>
-	<id>3</id>
+	<id>6</id>
+	<id>8</id>
+	<id>11</id>
 	</followers>
 </user>
-
-
+ 
 <user>
-	<id>3</id>
+	<id>115981751</id>
 	<screen_name>toshiemon18</screen_name>
 	<followers>
-	<id>1</id>
-	</followers>
-</user>
-
-<user>
-	<id>1</id>
-	<screen_name>toshiemon18</screen_name>
-	<followers>
-	<id>5</id>
+	<id>115981749</id>
+	<id>115981750</id>
+	<id>9</id>
 	</followers>
 </user>

@@ -144,7 +144,7 @@ namespace big_brother {
 					Eigen::Vector3d f(0,0,0);
 					if(v.norm() != 0){
 						v.normalize();
-						f = v*10;
+						f = v*5;
 					}
 					// Eigen::Vector3d nv = v.normalized();
 					// v = 0;

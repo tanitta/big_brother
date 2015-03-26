@@ -4,15 +4,22 @@
 #include <pharticle/pharticle.hpp>
 #include <data_manager.hpp>
 #include <user.hpp>
+#include <controller.hpp>
 namespace big_brother {
 	class BBAnalyzer : public ofBaseApp{
 		private:
 			pharticle::Engine ph_engine_;
 			DataManager data_manager_;
+			Controller controller_;
+			
+			int nearest_id_;
+			double nearest_distance_;
+			ofVec2f nearest_vertex_;
 			
 			ofEasyCam cam_;
 		public:
-			BBAnalyzer(){};
+			BBAnalyzer():controller_(data_manager_,ph_engine_,cam_),
+		nearest_id_(-1),nearest_distance_(0),nearest_vertex_(){};
 			virtual ~BBAnalyzer(){};
 			void setup(){
 				//graphics
@@ -23,6 +30,7 @@ namespace big_brother {
 				
 				data_manager_.load_from_xml("hoge.xml");
 				data_manager_.setup_particle();
+				controller_.setup();
 				
 				ph_engine_.set_func_reaction_force([](pharticle::Particle& p1, pharticle::Particle& p2){
 					Eigen::Vector3d f(0,0,0);
@@ -57,39 +65,21 @@ namespace big_brother {
 				std::cout << data_manager_.relations_.size() << std::endl;
 				
 				data_manager_.randomize(-200,200);
+				
+				data_manager_.users_[data_manager_.entry_id_].particle_.b_static_ = true;
+				data_manager_.users_[data_manager_.entry_id_].particle_.position_[0] = 0;
+				data_manager_.users_[data_manager_.entry_id_].particle_.position_[1] = 0;
+				data_manager_.users_[data_manager_.entry_id_].particle_.position_[2] = 0;
 			};
 			
 			void update(){
-				auto func_diffusion = [=](pharticle::Particle& p1, pharticle::Particle& p2){
-					Eigen::Vector3d v(0,0,0);
-					v = (p2.position_ );
-					// v.normalize();
-					Eigen::Vector3d f(0,0,0);
-					if(v.norm() != 0){
-						v.normalize();
-						f = v*10;
-					}
-					// Eigen::Vector3d nv = v.normalized();
-					// v = 0;
-					// v +=(p1.velocity_ - p2.velocity_)*0.5;
-					// v +=(- p2.velocity_)*0.2;
-					return f;
-				};
-				for (auto&& user : data_manager_.users_) {
-					ph_engine_.add_constraint_pair(&data_manager_.users_[data_manager_.entry_id_].particle_,&user.second.particle_,func_diffusion);
-				}
+				controller_.update();
 				
 				for (auto&& pair : data_manager_.relations_) {
 					ph_engine_.add_constraint_pair_bdi(pair);
 				}
 				ph_engine_.update();
 				
-				data_manager_.users_[data_manager_.entry_id_].particle_.position_[0] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.position_[1] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.position_[2] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[0] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[1] = 0;
-				data_manager_.users_[data_manager_.entry_id_].particle_.velocity_[2] = 0;
 				
 				
 				// int n = mesh.getNumVertices();
@@ -106,6 +96,26 @@ namespace big_brother {
 				// 		nearestIndex = i;
 				// 	}
 				// }
+				nearest_distance_ = 0;
+				nearest_vertex_;
+				nearest_id_ = -1;
+				ofVec2f mouse(mouseX, mouseY);
+				for(auto&& user : data_manager_.users_){
+					double x = user.second.particle_.position_[0];
+					double y = user.second.particle_.position_[1];
+					double z = user.second.particle_.position_[2];
+					ofVec3f cur = cam_.worldToScreen(ofVec3f(x,y,z));
+					// ofSetColor(ofColor::white);
+					// ofFill();
+					// ofCircle(cur, 2);
+					double distance = cur.distance(mouse);
+					if(nearest_id_ == -1 || distance < nearest_distance_) {
+						nearest_distance_ = distance;
+						nearest_vertex_ = cur;
+						nearest_id_ = user.second.id_;
+					}
+				}
+				controller_.set_nearest_user(nearest_id_,nearest_distance_);
 			};
 			
 			void draw(){
@@ -133,51 +143,47 @@ namespace big_brother {
 				}
 				cam_.end();
 				
-				double range = 100;
-				double nearest_distance = range;
-				ofVec2f nearest_vertex;
-				int nearest_id = 0;
-				ofVec2f mouse(mouseX, mouseY);
-				for(auto&& user : data_manager_.users_){
-					double x = user.second.particle_.position_[0];
-					double y = user.second.particle_.position_[1];
-					double z = user.second.particle_.position_[2];
-					ofVec3f cur = cam_.worldToScreen(ofVec3f(x,y,z));
-					// ofSetColor(ofColor::white);
-					// ofFill();
-					// ofCircle(cur, 2);
-					double distance = cur.distance(mouse);
-					if(distance < nearest_distance) {
-						nearest_distance= distance;
-						nearest_vertex = cur;
-						nearest_id = user.second.id_;
-					}
-				}
+				 
 				// std::cout << "nearest_distance: " << nearest_distance<< std::endl;
-				if(nearest_distance < range){
+				// 
+				
+				if(nearest_distance_ < 25){
+					ofVec2f mouse(mouseX, mouseY);
 					ofSetColor(ofColor::gray);
-					ofLine(nearest_vertex, mouse);
-
+					ofLine(nearest_vertex_, mouse);
+				
 					ofNoFill();
 					ofSetColor(ofColor::magenta);
 					ofSetLineWidth(2);
-					ofCircle(nearest_vertex, 4);
+					ofCircle(nearest_vertex_, 4);
 					ofSetLineWidth(1);
-
+				
 					ofVec2f offset(10, -10);
 					std::string info = "";
-					info +="user_id : "+ofToString(nearest_id);
+					info +="user_id : "+ofToString(nearest_id_);
 					info +="\n";
-					info +="screen_name : "+ofToString(data_manager_.users_[nearest_id].screen_name_);
+					info +="screen_name : "+ofToString(data_manager_.users_[nearest_id_].screen_name_);
 					ofDrawBitmapStringHighlight(info, mouse + offset);
 				}
+				
+				controller_.draw();
 			};
 			
-			void keyPressed(int key){};
+			void keyPressed(int key){
+				char keys[] = {(char)key};
+				std::string strKeys=(std::string)keys;
+				strKeys.resize(1);
+				controller_.key_pressed(strKeys);
+			};
 			void keyReleased(int key){};
 			void mouseMoved(int x, int y ){};
-			void mouseDragged(int x, int y, int button){};
-			void mousePressed(int x, int y, int button){};
+			void mouseDragged(int x, int y, int button){
+			};
+			void mousePressed(int x, int y, int button){
+				if(nearest_distance_ < 25){
+					controller_.change_select();
+				}
+			};
 			void mouseReleased(int x, int y, int button){};
 			void windowResized(int w, int h){};
 			void dragEvent(ofDragInfo dragInfo){};

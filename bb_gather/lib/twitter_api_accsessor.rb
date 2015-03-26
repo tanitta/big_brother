@@ -5,6 +5,8 @@
 
 module TweetLib
 	class TwitterAPIAccessor
+
+		attr_reader :counter
 		
 		def initialize(proc)
 			@proc = proc
@@ -12,12 +14,9 @@ module TweetLib
 		end
 
 		def call(args={})
-			@proc.call(args)
 			@counter = @counter + 1
+			return @proc.call(args)
 		end
 
-		def get_counter
-			@counter
-		end
 	end
 end

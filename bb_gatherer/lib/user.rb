@@ -1,6 +1,7 @@
 require 'uri'
 require 'net/https'
 require 'nokogiri'
+
 module Gatherer
   class User
     def initialize(user_name, options = {search_limit:10})
@@ -14,6 +15,7 @@ module Gatherer
     def scrape_user(search_limit)
       html = Gatherer::html_from_uri("http://twilog.org/#{ @name }/friends")
       
+      # wip
       exist_user = false
       if exist_user
         pages = 1

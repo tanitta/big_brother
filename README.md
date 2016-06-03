@@ -8,7 +8,7 @@ twitter難しい
 テクノロジの力でアレする
 
 ##Specification
-rubyでデータを集めてoFで可視化
+rubyでデータを収集しarmosにより可視化を行う．
 
 ##Install
 

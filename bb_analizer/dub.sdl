@@ -1,0 +1,19 @@
+name "default"
+description "A minimal D application."
+copyright "Copyright © 2015, tanitta"
+authors "tanitta"
+
+dependency "armos" path="/home/tanitta/dev/armos"
+
+buildType "debug-profile" {
+	buildOptions "debugMode" "debugInfo" "profile"
+}
+
+buildType "optimized" {
+	buildOptions "optimize"
+}
+
+buildType "spec" {
+	buildOptions "unittests"
+	versions "spec"
+}

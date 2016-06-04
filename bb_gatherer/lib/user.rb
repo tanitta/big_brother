@@ -1,5 +1,6 @@
 require 'uri'
 require 'net/https'
+require 'open-uri'
 require 'nokogiri'
 
 module Gatherer
@@ -13,10 +14,11 @@ module Gatherer
 
     private
     def scrape_user(search_limit)
-      html = Gatherer::html_from_uri("http://twilog.org/#{ @name }/friends")
+      uri = "http://twilog.org/#{ @name }/"
+      html = Gatherer::html_from_uri(uri)
       
       # wip
-      exist_user = false
+      exist_user = html.xpath('//title').text != "Twilog"
       if exist_user
         pages = 1
       end
@@ -27,16 +29,25 @@ module Gatherer
     end
   end
 
+  private
   def html_from_uri(uri_string)
-    uri = URI.parse(uri_string)
-    http = Net::HTTP.new(uri.host, uri.port)
-    if uri.scheme == 'https'
-      http.use_ssl = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    # uri = URI.parse(uri_string)
+    # http = Net::HTTP.new(uri.host, uri.port)
+    # if uri.scheme == 'https'
+    #   http.use_ssl = true
+    #   http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    # end
+    # request = Net::HTTP::Get.new(uri.request_uri)
+    # response = http.request(request)
+    # p response.body
+    # return Nokogiri::HTML(response.body)
+    charset = nil
+    html = open(uri_string, 'User-Agent'=>'firefox') do |f|
+      charset = f.charset
+      f.read
     end
-    request = Net::HTTP::Get.new(uri.request_uri)
-    response = http.request(request)
-    return Nokogiri::HTML(response.body)
+    Nokogiri::HTML.parse(html, nil, charset)
   end
+  
   module_function :html_from_uri
 end

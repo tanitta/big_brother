@@ -20,8 +20,15 @@ module Gatherer
       # wip
       exist_user = html.xpath('//title').text != "Twilog"
       if exist_user
-        pages = 1
+        pages = user_friend_pages
       end
+    end
+    
+    def user_friend_pages
+      uri = "http://twilog.org/#{ @name }/friends"
+      html = Gatherer::html_from_uri(uri)
+      pagenation = html.search('ul[class="pagination"]')[0]
+      pagenation ? pagenation.search('li')[pagenation.search('li').length - 2].children[0].text.to_i : 1
     end
 
     def scrape_user_page(search_limit, page_number)

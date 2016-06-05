@@ -1,0 +1,13 @@
+#!/bin/sh
+# -*- ruby -*-
+exec ruby -x "$0" "$@"
+#!ruby
+#
+require_relative '../lib/user'
+
+user_name = ARGV[0]
+relations_limit = ARGV[1].to_i
+
+user = Gatherer::User.new(user_name, search_limit:relations_limit)
+
+user.relations.each{|name, weight| puts (name + ":" + weight.to_s)}

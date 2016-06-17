@@ -118,18 +118,17 @@ class Gatherer{
         auto output = execute(["ruby", "../bb_gatherer/bin/gather", from.name, limit.text]).output;
         if(!output.empty){
             auto listWithoutEmpty = output.split("\n")[0..$-1];
-            listWithoutEmpty.each!((str){
-                    import std.random;
-                    ar.Vector3d spawnPoint = from.position + from.radius.to!double * ar.Vector3d(uniform(-1.0, 1.0), uniform(-1.0, 1.0), 0.0).normalized;
-                    User to = new User(str.split(":")[0], spawnPoint);
-                    int weight = str.split(":")[1].to!int;
+            foreach (str; listWithoutEmpty) {
+                import std.random;
+                ar.Vector3d spawnPoint = from.position + from.radius.to!double * ar.Vector3d(uniform(-1.0, 1.0), uniform(-1.0, 1.0), 0.0).normalized;
+                User to = new User(str.split(":")[0], spawnPoint);
+                int weight = str.split(":")[1].to!int;
 
-                    auto relation = new Relation(from, to, weight);
-                    _users[to.name] = to;
-                    _relations[from][to] = relation;
-                    _users_slice ~= to;
-                    _relations_slice ~= relation;
-                    });
+                _users[to.name] = to;
+                _relations[from.name][to.name] = weight;
+                _users_slice ~= to;
+                // _relations_slice ~= relation;
+            }
         }
     }
 
@@ -141,7 +140,7 @@ class Gatherer{
         return _users_slice;
     }
 
-    Relation[User][User] relations(){
+    int[string][string] relations(){
         return _relations;
     }
 
@@ -159,7 +158,7 @@ class Gatherer{
     private{
         User[string] _users;
         User[] _users_slice;
-        Relation[User][User] _relations;
+        int[string][string] _relations;
         Relation[] _relations_slice;
     }
 }
@@ -184,70 +183,30 @@ class TestApp : ar.BaseApp{
         };
     }
 
-    void setup(){
+    override void setup(){
         ar.blendMode(ar.BlendMode.Alpha);
 
         _font = new ar.BitmapFont();
         _font.load("font.png", 8, 8);
 
-        _targetUser = new User("trit_techne");
+        string targetUserName = "ttata_trit";
+        _users[targetUserName] = new User(targetUserName);
+        _targetUser = _users[targetUserName];
 
         import core.thread;
-        auto t1 = new Thread({gather;}).start;
+        // auto t1 = new Thread({gather;}).start;
     }
 
-    void gather(){
-        for(;;){
-            Gatherer gatherer = new Gatherer;
 
-            import std.stdio;
-            gatherer.detect(_targetUser, 100);
-
-            import std.algorithm.searching;
-            foreach (ref user; gatherer.users) {
-                if(!_users.keys.canFind(user.name)){
-                    _users[user.name] = user;
-                }
-            }
-
-            import std.algorithm;
-            foreach (User userFrom,  ref tos; gatherer.relations) {
-                foreach (User userTo,  ref relation; tos) {
-                    if(!_relations.keys.map!(user => user.name).canFind(userFrom.name) || !_relations[userFrom].keys.map!(user => user.name).canFind(userTo.name)){
-                        _relations[userFrom][userTo] = relation;
-                    }
-                }
-            }
-
-            {
-                bool isNewUser = false;
-                int nextUserIndex = 0;
-                do{
-                    nextUserIndex.writeln;
-                    _targetUser = gatherer.users_slice[nextUserIndex];
-                    isNewUser = !_relations.keys.map!(user => user.name).canFind(_targetUser.name);
-                    nextUserIndex++;
-                }while(!isNewUser);
-            }
-
-            "nextTarget".writeln;
-            _targetUser.name.writeln;
-
-            gatherer.clear;
-            import core.thread;
-            Thread.sleep( dur!("seconds")( 5 ) );
-        }
-    }
-
-    void update(){
+    override void update(){
         foreach (ref user; _users) {
             user.update;
             user.entity.addForce(-user.entity.velocity*1.0);
             _engine.add(user.entity);
         }
 
-        foreach (User userFrom,  ref tos; _relations) {
-            foreach (User userTo,  ref relation; tos) {
+        foreach (string userFromName,  ref tos; _relations) {
+            foreach (string  userToName,  ref relation; tos) {
                 import std.stdio;
                 _engine.add(relation.pair);
             }
@@ -256,12 +215,12 @@ class TestApp : ar.BaseApp{
         _engine.update;
     }
 
-    void draw(){
+    override void draw(){
         ar.pushMatrix;
         import std.conv;
         ar.translate(ar.windowSize[0].to!float*0.5, ar.windowSize[1].to!float*0.5, 0.0);
-        foreach (User userFrom,  ref tos; _relations) {
-            foreach (User userTo,  ref relation; tos) {
+        foreach (string userFromName,  ref tos; _relations) {
+            foreach (string userToName,  ref relation; tos) {
                 relation.draw;
             }
         }
@@ -273,26 +232,71 @@ class TestApp : ar.BaseApp{
         ar.popMatrix;
     }
 
-    void keyPressed(int key){}
+    override void keyPressed(int key){}
 
-    void keyReleased(int key){}
+    override void keyReleased(int key){}
 
-    void mouseMoved(ar.Vector2i position, int button){}
+    override void mouseMoved(ar.Vector2i position, int button){}
 
-    void mousePressed(ar.Vector2i position, int button){}
+    override void mousePressed(ar.Vector2i position, int button){}
 
-    void mouseReleased(ar.Vector2i position, int button){}
+    override void mouseReleased(ar.Vector2i position, int button){}
+    
+    override void exit(){}
 
     private{
         User _targetUser;
 
         User[string] _users;
-        Relation[User][User] _relations;
+        Relation[string][string] _relations;
         double _counter;
 
         ar.BitmapFont _font;
 
         pharticle.Engine _engine;
+        
+        void gather(){
+            for(;;){
+                Gatherer gatherer = new Gatherer;
+
+                import std.stdio;
+                gatherer.detect(_targetUser, 10);
+
+                import std.algorithm.searching;
+                foreach (ref user; gatherer.users) {
+                    if(!_users.keys.canFind(user.name)){
+                        _users[user.name] = user;
+                    }
+                }
+
+                import std.algorithm;
+                foreach (string userFromName,  ref tos; gatherer.relations) {
+                    foreach (string userToName,  ref relation; tos) {
+                        if(!_relations.keys.canFind(userFromName) || !_relations[userFromName].keys.canFind(userToName)){
+                            _relations[userFromName][userToName] = new Relation(_users[userFromName], _users[userToName], relation );
+                        }
+                    }
+                }
+
+                {
+                    bool isNewUser = false;
+                    int nextUserIndex = 0;
+                    do{
+                        nextUserIndex.writeln;
+                        _targetUser = gatherer.users_slice[nextUserIndex];
+                        isNewUser = !_relations.keys.canFind(_targetUser.name);
+                        nextUserIndex++;
+                    }while(!isNewUser);
+                }
+
+                "nextTarget".writeln;
+                _targetUser.name.writeln;
+
+                gatherer.clear;
+                import core.thread;
+                Thread.sleep( dur!("seconds")( 5 ) );
+            }
+        }
     }
 }
 

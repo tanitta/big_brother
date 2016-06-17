@@ -164,6 +164,7 @@ class Gatherer{
 }
 
 
+import core.thread;
 class TestApp : ar.BaseApp{
     this(){
         _engine = new pharticle.Engine;
@@ -193,8 +194,7 @@ class TestApp : ar.BaseApp{
         _users[targetUserName] = new User(targetUserName);
         _targetUser = _users[targetUserName];
 
-        import core.thread;
-        // auto t1 = new Thread({gather;}).start;
+        _threadGather = new Thread({gather;}).start;
     }
 
 
@@ -242,7 +242,10 @@ class TestApp : ar.BaseApp{
 
     override void mouseReleased(ar.Vector2i position, int button){}
     
-    override void exit(){}
+    override void exit(){
+        _shouldExit = true;
+        _threadGather.join;
+    }
 
     private{
         User _targetUser;
@@ -255,8 +258,11 @@ class TestApp : ar.BaseApp{
 
         pharticle.Engine _engine;
         
+        bool _shouldExit = false;
+        Thread _threadGather;
+        
         void gather(){
-            for(;;){
+            while(!_shouldExit){
                 Gatherer gatherer = new Gatherer;
 
                 import std.stdio;
@@ -293,8 +299,6 @@ class TestApp : ar.BaseApp{
                 _targetUser.name.writeln;
 
                 gatherer.clear;
-                import core.thread;
-                Thread.sleep( dur!("seconds")( 5 ) );
             }
         }
     }

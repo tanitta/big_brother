@@ -90,6 +90,12 @@ class Relation{
         import std.array;
         return [from.name, to.name, weight.to!string].join(",");
     }
+    
+    string csv_line(float max){
+        import std.conv;
+        import std.array;
+        return [from.name, to.name, (weight.to!float/max).to!string].join(",");
+    }
     unittest{
         auto userFrom = new User("Alice");
         auto userTo = new User("Bob");
@@ -260,6 +266,7 @@ class TestApp : ar.BaseApp{
         
         import std.stdio;
         csv.writeln;
+        save_csv;
     }
 
     private{
@@ -281,7 +288,7 @@ class TestApp : ar.BaseApp{
                 Gatherer gatherer = new Gatherer;
 
                 import std.stdio;
-                gatherer.detect(_targetUser, 10);
+                gatherer.detect(_targetUser, 100);
 
                 import std.algorithm.searching;
                 foreach (ref user; gatherer.users) {
@@ -317,9 +324,7 @@ class TestApp : ar.BaseApp{
 
                 gatherer.clear;
                 
-                // if (!_shouldExit) {
-                    Thread.sleep( dur!("seconds")( 5 ) );
-                // }
+                Thread.sleep( dur!("seconds")( 5 ) );
             }
         }
         
@@ -327,11 +332,26 @@ class TestApp : ar.BaseApp{
             import std.array;
             import std.algorithm;
             
-            string r;
+            import std.math;
+            double max = 0.0;
             foreach (string userFromName,  ref tos; _relations) {
-                r ~= tos.keys.map!(i => tos[i].csv_line).join("\n");
+                foreach (string userToName,  ref relation; tos) {
+                    max = fmax(max, relation.weight);
+                }
+            }
+            
+            string r = "Source,Target,Weight\n";
+            foreach (string userFromName,  ref tos; _relations) {
+                r ~= tos.keys.map!(i => tos[i].csv_line(max)).join("\n");
             }
             return r;
+        }
+        
+        void save_csv(){
+            import std.stdio;
+            auto f = File("foo.csv", "w"); 
+            f.write(csv);
+            f.detach;
         }
     }
 }

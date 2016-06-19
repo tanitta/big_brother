@@ -84,6 +84,18 @@ class Relation{
         ar.setColor(64);
         ar.drawLine(from.entity.position, to.entity.position);
     }
+    
+    string csv_line(){
+        import std.conv;
+        import std.array;
+        return [from.name, to.name, weight.to!string].join(",");
+    }
+    unittest{
+        auto userFrom = new User("Alice");
+        auto userTo = new User("Bob");
+        auto relation = new Relation(userFrom, userTo, 1);
+        assert(relation.csv_line == "Alice,Bob,1");
+    }
 
     User from;
     User to;
@@ -190,7 +202,7 @@ class TestApp : ar.BaseApp{
         _font = new ar.BitmapFont();
         _font.load("font.png", 8, 8);
 
-        string targetUserName = "ttata_trit";
+        string targetUserName = "4_d";
         _users[targetUserName] = new User(targetUserName);
         _targetUser = _users[targetUserName];
 
@@ -245,6 +257,9 @@ class TestApp : ar.BaseApp{
     override void exit(){
         _shouldExit = true;
         _threadGather.join;
+        
+        import std.stdio;
+        csv.writeln;
     }
 
     private{
@@ -283,7 +298,9 @@ class TestApp : ar.BaseApp{
                         }
                     }
                 }
-
+                
+                if(gatherer.users_slice.length == 0)return;
+                
                 {
                     bool isNewUser = false;
                     int nextUserIndex = 0;
@@ -299,7 +316,22 @@ class TestApp : ar.BaseApp{
                 _targetUser.name.writeln;
 
                 gatherer.clear;
+                
+                // if (!_shouldExit) {
+                    Thread.sleep( dur!("seconds")( 5 ) );
+                // }
             }
+        }
+        
+        string csv(){
+            import std.array;
+            import std.algorithm;
+            
+            string r;
+            foreach (string userFromName,  ref tos; _relations) {
+                r ~= tos.keys.map!(i => tos[i].csv_line).join("\n");
+            }
+            return r;
         }
     }
 }
